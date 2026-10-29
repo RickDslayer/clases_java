@@ -1,0 +1,101 @@
+@startuml
+' Diagrama de clases del Reto 2 (versión POO). Se puede ver con el plugin PlantUML de IntelliJ.
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+title Diagrama de clases UML · Reto 2 Simulador de créditos (POO)
+
+package s03reto02poo {
+
+  class S03Reto02CreditosPOO {
+    + {static} main(args : String[]) : void
+  }
+
+  class LectorConsola {
+    - scanner : Scanner {readOnly}
+    + LectorConsola(scanner : Scanner)
+    + leerEnRango(etiqueta : String, min : long, max : long) : long
+    + leerSolicitud() : SolicitudCredito
+  }
+
+  class EvaluadorCredito {
+    - {static} EDAD_MINIMA : long = 18 {readOnly}
+    - {static} EDAD_MAXIMA : long = 70 {readOnly}
+    - {static} LIMITE_APROBACION : long = 35 {readOnly}
+    - {static} LIMITE_REVISION : long = 45 {readOnly}
+    + evaluar(solicitud : SolicitudCredito) : ResultadoEvaluacion
+  }
+
+  class EstadisticasCreditos {
+    - evaluadas : int
+    - aprobadas : int
+    - revisionManual : int
+    - rechazadas : int
+    + registrar(clasificacion : Clasificacion) : void
+    + generarResumen() : String
+    + getEvaluadas() : int
+    + getAprobadas() : int
+    + getRevisionManual() : int
+    + getRechazadas() : int
+  }
+
+  class SolicitudCredito {
+    + {static} EDAD_MIN : long = 0 {readOnly}
+    + {static} EDAD_MAX : long = 120 {readOnly}
+    + {static} DINERO_MAX : long = 1000000000 {readOnly}
+    + {static} CREDITO_MIN : long = 1 {readOnly}
+    + {static} MESES_MIN : long = 1 {readOnly}
+    + {static} MESES_MAX : long = 360 {readOnly}
+    - edad : long {readOnly}
+    - ingresos : long {readOnly}
+    - gastos : long {readOnly}
+    - credito : long {readOnly}
+    - meses : long {readOnly}
+    + SolicitudCredito(edad, ingresos, gastos, credito, meses : long)
+    - {static} validarRango(campo : String, valor, min, max : long) : void
+    + getDisponible() : long
+    + getEdad() : long
+    + getIngresos() : long
+    + getGastos() : long
+    + getCredito() : long
+    + getMeses() : long
+  }
+
+  class ResultadoEvaluacion {
+    - clasificacion : Clasificacion {readOnly}
+    - motivo : String {readOnly}
+    - calculado : boolean {readOnly}
+    - disponible : long {readOnly}
+    - cuotaAproximada : long {readOnly}
+    - endeudamiento : double {readOnly}
+    - ResultadoEvaluacion(...)
+    + {static} rechazoPrevio(motivo : String) : ResultadoEvaluacion
+    + {static} conCalculo(clasificacion : Clasificacion, disponible : long, cuotaAproximada : long, endeudamiento : double) : ResultadoEvaluacion
+    + generarReporte() : String
+    + getClasificacion() : Clasificacion
+    + getMotivo() : String
+    + isCalculado() : boolean
+    + getDisponible() : long
+    + getCuotaAproximada() : long
+    + getEndeudamiento() : double
+  }
+
+  enum Clasificacion <<enumeration>> {
+    APROBADA
+    REVISION_MANUAL
+    RECHAZADA
+    - etiqueta : String {readOnly}
+    - Clasificacion(etiqueta : String)
+    + getEtiqueta() : String
+  }
+}
+
+S03Reto02CreditosPOO ..> LectorConsola : «crea»
+S03Reto02CreditosPOO ..> EvaluadorCredito : «crea»
+S03Reto02CreditosPOO ..> EstadisticasCreditos : «crea»
+LectorConsola ..> SolicitudCredito : «crea»
+EvaluadorCredito ..> SolicitudCredito : «usa»
+EvaluadorCredito ..> ResultadoEvaluacion : «crea»
+EstadisticasCreditos ..> Clasificacion : «usa»
+ResultadoEvaluacion --> "1" Clasificacion : -clasificacion
+
+@enduml
